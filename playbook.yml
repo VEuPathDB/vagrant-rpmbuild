@@ -1,0 +1,38 @@
+# bootstrap VM with pre-Puppet tasks
+---
+- hosts: all
+  sudo: no
+  gather_facts: False
+  vars:
+    rpmbuild_topdir: /vagrant/scratch/rpmbuild
+    rpmbuild_dist: uga
+
+  tasks:
+
+    - yum: name="{{ item }}"
+      with_items:
+        - git
+        - rpm-build
+      sudo: yes
+
+    - name: add git host to known_hosts
+      known_hosts: path="/home/vagrant/.ssh/known_hosts"
+                   host='git.apidb.org'
+                   key="{{ lookup('pipe','ssh-keyscan git.apidb.org') }}"
+
+    - template: dest=/home/vagrant/.rpmmacros
+                src=templates/rpmmacros.j2
+
+    - file: path="{{ item }}"
+            state=directory
+      with_items:
+        - rpmbuild/BUILD
+        - rpmbuild/BUILDROOT
+        - rpmbuild/RPMS
+        - rpmbuild/SOURCES
+        - rpmbuild/SPECS
+        - rpmbuild/SRPMS
+
+    - file: path="{{rpmbuild_topdir}}"
+            src=/home/vagrant/rpmbuild
+            state=link

@@ -1,0 +1,20 @@
+- hosts: all
+  sudo: yes
+  gather_facts: False
+  vars:
+    pkg=http://pulp.uga.apidb.org/pulp/repos/eupathdb/6/SRPMS/python27-2.7.3-1.src.rpm
+
+  tasks:
+
+    # yum: name="{{ pkg }}" # dangerous: this overwrites any edited spec file
+
+    - yum: name="{{ item }}"
+      with_items:
+        - expat-devel
+        - db4-devel
+        - gdbm-devel
+        - sqlite-devel
+        - readline-devel
+        - zlib-devel
+        - bzip2-devel
+        - openssl-devel
