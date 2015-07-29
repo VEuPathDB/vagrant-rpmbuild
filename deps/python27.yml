@@ -2,7 +2,7 @@
   sudo: yes
   gather_facts: False
   vars:
-    pkg=http://pulp.uga.apidb.org/pulp/repos/eupathdb/6/SRPMS/python27-2.7.3-1.src.rpm
+    pkg: http://pulp.uga.apidb.org/pulp/repos/eupathdb/6/SRPMS/python27-2.7.3-1.src.rpm
 
   tasks:
 

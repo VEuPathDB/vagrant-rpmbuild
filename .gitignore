@@ -2,4 +2,6 @@
 .vagrant
 puppet
 scratch/*
+sensitive/*
+!sensitive/README
 !.gitignore

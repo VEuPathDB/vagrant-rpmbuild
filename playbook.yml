@@ -9,11 +9,24 @@
 
   tasks:
 
+    - get_url: url=https://repos.fedorapeople.org/repos/pulp/pulp/rhel-pulp.repo
+               dest=/etc/yum.repos.d/pulp-v2-stable.repo
+      sudo: yes
+
+    - yum: name=https://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+      sudo: yes
+
     - yum: name="{{ item }}"
       with_items:
         - git
         - rpm-build
+        - rpmdevtools
+        - pulp-admin-client
+        - pulp-rpm-admin-extensions
+        - rubygem-gem2rpm
       sudo: yes
+
+    - include: tasks/apidb-ca.yml
 
     - name: add git host to known_hosts
       known_hosts: path="/home/vagrant/.ssh/known_hosts"
@@ -23,16 +36,42 @@
     - template: dest=/home/vagrant/.rpmmacros
                 src=templates/rpmmacros.j2
 
-    - file: path="{{ item }}"
+    - file: path="{{ rpmbuild_topdir }}/{{ item }}"
             state=directory
       with_items:
-        - rpmbuild/BUILD
-        - rpmbuild/BUILDROOT
-        - rpmbuild/RPMS
-        - rpmbuild/SOURCES
-        - rpmbuild/SPECS
-        - rpmbuild/SRPMS
+        - BUILD
+        - BUILDROOT
+        - RPMS
+        - SOURCES
+        - SPECS
+        - SRPMS
 
-    - file: path="{{rpmbuild_topdir}}"
-            src=/home/vagrant/rpmbuild
+    - copy: src=sensitive/gnupg/
+            dest=/home/vagrant/.gnupg
+
+    - file: path=/home/vagrant/rpmbuild
+            src="{{rpmbuild_topdir}}"
             state=link
+
+    - copy: src=files/macros.eupathdbworkflow
+            dest=/etc/rpm/macros.eupathdbworkflow
+            owner=root
+            group=root
+            mode=-644
+      sudo: yes
+
+    - ini_file: dest=/etc/pulp/admin/admin.conf
+                section=server
+                option="{{ item.option }}"
+                value="{{ item.value }}"
+      sudo: yes
+      with_items:
+        - { option: 'host',
+            value: 'pulp.uga.apidb.org'
+          }
+        - { option: 'port',
+            value: '443'
+          }
+        - { option: 'api_prefix',
+            value: '/pulp/api',
+          }

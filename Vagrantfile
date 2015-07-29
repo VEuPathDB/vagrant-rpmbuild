@@ -6,14 +6,11 @@ Vagrant.configure(2) do |config|
   config.vm.hostname = 'package-6-64'
 
   config.vm.provision :ansible do |ansible|
-    ansible.playbook = "playbook.yml"
+    ansible.playbook = 'playbook.yml'
+    ansible.extra_vars = {
+      builder_uid: Process.uid,
+      builder_gid: Process.gid,
+    }
   end
 
-#   config.vm.provision :puppet do |puppet|
-#     puppet.options = '--disable_warnings=deprecations'
-#     puppet.manifests_path = 'puppet/manifests'
-#     puppet.manifest_file = ''
-#     puppet.hiera_config_path = 'puppet/hiera.yaml'
-#     puppet.module_path = ['puppet/modules', 'puppet/modules/forge', 'puppet/modules/custom', 'puppet/locations', 'puppet/projects']
-#   end
 end

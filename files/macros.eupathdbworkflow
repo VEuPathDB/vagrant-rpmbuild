@@ -1,0 +1,81 @@
+# For packaging workflow RPMs for EuPathDB
+####################################################################################
+### DEFINITIONS ####################################################################
+
+%debug_package %{nil}
+
+%_manifest_file MANIFEST.EUPATH
+
+%_software_topdir software
+
+# use in %pre and %install manifest
+%_pre_install_dir  %{buildroot}/%{prefix}/%{_software_topdir}/%{_pkg_base}/%{version}
+
+# use in %files manifest
+%_install_dir %{prefix}/%{_software_topdir}/%{_pkg_base}/%{version}
+
+# use in %post manifest
+%_post_install_dir  $RPM_INSTALL_PREFIX0/%{_software_topdir}/%{_pkg_base}/%{version}
+
+####################################################################################
+
+# enforce naming conventions for relocatable workflow packages
+%eupa_validate_workflow_pkg_name \
+    [[ "%{_pkg_base}" == *"-"* ]] &&  {\
+           echo "invalid _pkg_base %{_pkg_base}" \
+           exit 1\
+        }
+
+####################################################################################
+# Add entries to a manifest file that documents desired symlinks after installation.
+# The symlink creation is managed by a non-RPM process (eg. manually or Puppet)
+#
+# First argument is the file, relative to buildroot.
+# Second argument is the name of the desired symlink to be
+# created in %{prefix}/bin, %{prefix}/profile, etc.
+# The second argument can be omitted if it's to be exactly the same as
+# the first.
+#
+#
+# %mfest_bin   bowtie-inspect
+# %mfest_bin   scripts/gen_occ_lookup.pl               gen_occ_lookup.pl
+#
+# Will make manifest entries
+#
+# software/bowtie/0.12.7/bowtie-inspect,bin/bowtie-inspect
+# software/bowtie/0.12.7/scripts/gen_occ_lookup.pl,bin/gen_occ_lookup.pl
+#
+# The external manifest reader should create symlinks
+#
+# %{prefix}/bin/bowtie-inspect -> %{prefix}/software/bowtie/0.12.7/bowtie-inspect
+# %{prefix}/bin/gen_occ_lookup.pl -> %{prefix}/software/bowtie/0.12.7/scripts/gen_occ_lookup.pl
+
+%mfest() \
+if test -f %{_pre_install_dir}/$src; then \
+  echo %{_software_topdir}/%{_pkg_base}/%{version}/$src,$path/$dest >> %{_pre_install_dir}/%{_manifest_file} \
+else \
+  echo %{_pre_install_dir}/$src not found when adding to manifest \
+  exit 1 \
+fi\
+%{nil}
+
+# if %2 is not defined, use %1 for dest
+%mfest_lib() path=lib; src=%1; dest=%{expand:%%{?2:%2}%%{!?2:%1}}; %mfest \
+%{nil}
+
+# if %2 is not defined, use %1 for dest
+%mfest_bin() path=bin; src=%1; dest=%{expand:%%{?2:%2}%%{!?2:%1}}; %mfest \
+%{nil}
+
+# if %2 is not defined, use %1 for dest
+%mfest_profile() path=etc/profile.d; src=%1; dest=%{expand:%%{?2:%2}%%{!?2:%1}}; %mfest \
+%{nil}
+
+####################################################################################
+# remove _pkg_base dir if empty
+%rm_pkg_base_dir() \
+_PKG_BASE_DIR=$RPM_INSTALL_PREFIX0/%{_software_topdir}/%{_pkg_base} \
+if [ ! "$(ls -A $_PKG_BASE_DIR)" ]; then \
+    rmdir $_PKG_BASE_DIR \
+fi \
+%{nil}
