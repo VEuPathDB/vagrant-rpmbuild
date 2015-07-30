@@ -1,0 +1,21 @@
+- hosts: all
+  sudo: yes
+  gather_facts: False
+
+  tasks:
+
+    - yum: name="{{ item }}"
+      with_items:
+        - rubygems-devel
+
+    - git: repo=https://github.com/mheiges/vagrant-libvirt-rpm
+           dest="{{ rpmbuild_topdir }}/SPECS"
+      sudo: no
+
+    - copy: src="{{ rpmbuild_topdir }}/SPECS/vagrant-libvirt-rpm/{{ item }}"
+            dest="{{ rpmbuild_topdir }}/SOURCES/
+      sudo: no
+      with_items:
+        - rubygem-vagrant-libvirt.spec
+        - vagrant-libvirt-nokogiri-version.patch
+        - vagrant-libvirt.pkla

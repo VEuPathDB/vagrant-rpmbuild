@@ -1,0 +1,14 @@
+
+
+- copy: src=files/RPM-GPG-KEY-EUPATHDB
+        dest=/etc/pki/rpm-gpg/RPM-GPG-KEY-EUPATHDB
+
+
+- template: src='{{ item.src }}'
+            dest='{{ item.dest }}'
+            force=yes
+  with_items: 
+    - { src: templates/eupathdb.repo.j2,
+        dest: /etc/yum.repos.d/eupathdb.repo }
+    - { src: templates/eupathdb-fasttrack.repo.j2,
+        dest: /etc/yum.repos.d/eupathdb-fasttrack.repo }

@@ -2,12 +2,15 @@
 ---
 - hosts: all
   sudo: no
-  gather_facts: False
+  gather_facts: True
   vars:
     rpmbuild_topdir: /vagrant/scratch/rpmbuild
     rpmbuild_dist: uga
 
   tasks:
+
+    - include: tasks/eupathdb-yumrepo.yml
+      sudo: yes
 
     - get_url: url=https://repos.fedorapeople.org/repos/pulp/pulp/rhel-pulp.repo
                dest=/etc/yum.repos.d/pulp-v2-stable.repo
@@ -24,6 +27,9 @@
         - pulp-admin-client
         - pulp-rpm-admin-extensions
         - rubygem-gem2rpm
+        - python-virtualenv
+        - python-pip
+        - python27-devel
       sudo: yes
 
     - include: tasks/apidb-ca.yml
