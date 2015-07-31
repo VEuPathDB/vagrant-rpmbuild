@@ -1,9 +1,11 @@
 
 - yum: name=ca-certificates
+  sudo: yes
 
 - command: "/usr/bin/update-ca-trust check 2>&1 | /bin/grep -iq 'status: ENABLED.'"
   register: ca_trust_enabled
   changed_when: false
+  sudo: yes
 
 - shell: /usr/bin/update-ca-trust enable
   when: ca_trust_enabled.rc !=0
