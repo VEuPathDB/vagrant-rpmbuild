@@ -4,7 +4,7 @@
   sudo: no
   gather_facts: True
   vars:
-    rpmbuild_topdir: /vagrant/scratch/rpmbuild
+    rpmbuild_topdir: '/vagrant/scratch/{{ ansible_distribution_major_version }}/rpmbuild'
     rpmbuild_dist: uga
 
   tasks:
@@ -16,7 +16,7 @@
                dest=/etc/yum.repos.d/pulp-v2-stable.repo
       sudo: yes
 
-    - yum: name=https://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+    - yum: name=epel-release
       sudo: yes
 
     - yum: name="{{ item }}"
@@ -29,8 +29,23 @@
         - rubygem-gem2rpm
         - python-virtualenv
         - python-pip
+        - cpanspec
+        - perl-ExtUtils-MakeMaker
+        - perl-Test-Simple
+      sudo: yes
+
+    - yum: name="{{ item }}"
+      with_items:
         - python27-devel
       sudo: yes
+      when: ansible_distribution_major_version == '6'
+
+    - yum: name="{{ item }}"
+      with_items:
+        - python-devel
+        - rpm-sign
+      sudo: yes
+      when: ansible_distribution_major_version == '7'
 
     - include: tasks/apidb-ca.yml
 
@@ -39,6 +54,9 @@
                    host='git.apidb.org'
                    key="{{ lookup('pipe','ssh-keyscan git.apidb.org') }}"
 
+    - command: whoami
+      register: local_username
+      delegate_to: 127.0.0.1
     - template: dest=/home/vagrant/.rpmmacros
                 src=templates/rpmmacros.j2
 
