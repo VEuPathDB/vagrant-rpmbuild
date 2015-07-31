@@ -2,13 +2,13 @@
 - yum: name=ca-certificates
   sudo: yes
 
-- command: "/usr/bin/update-ca-trust check 2>&1 | /bin/grep -iq 'status: ENABLED.'"
+- command: "/usr/bin/update-ca-trust check 2>&1"
   register: ca_trust_enabled
   changed_when: false
-  sudo: yes
+  sudo: no
 
 - shell: /usr/bin/update-ca-trust enable
-  when: ca_trust_enabled.rc !=0
+  when: ca_trust_enabled.stdout.find('DISABLED') != -1
   sudo: yes
   
 - copy: src=files/apidb-ca-rsa.crt
