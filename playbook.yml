@@ -57,6 +57,7 @@
     - command: whoami
       register: local_username
       delegate_to: 127.0.0.1
+      changed_when: false
     - template: dest=/home/vagrant/.rpmmacros
                 src=templates/rpmmacros.j2
 
