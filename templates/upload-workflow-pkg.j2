@@ -1,0 +1,90 @@
+#/bin/sh
+
+if [[ -z "$1" ]]; then
+  echo 'Upload rpms to  eupathdb-{{ ansible_distribution_major_version }}-workflow YUM repo.'
+  echo 'This is a wrapper on pulp-admin utilities.'
+  echo 'Usage:'
+  echo '  upload-workflow-pkg <(partial)name>'
+  echo 'where <name> is a full file name (no path) or'
+  echo 'beginning of file name. All matching rpm files in RPMS and SRPMS'
+  echo 'of the rpmbuild directory tree will be uploaded to the repo.'
+  exit 1
+fi
+
+rpmbuild_topdir={{ rpmbuild_topdir  }}
+rpm_name_stub="$1"
+rpm_file_glob="${rpm_name_stub}*"
+
+bold="\e[1m"
+green="\e[32m"
+reset="\e[0m"
+
+bin_rpm=($(find ${rpmbuild_topdir}/RPMS -follow -name "$rpm_file_glob"))
+
+src_rpm=($(find ${rpmbuild_topdir}/SRPMS/ -follow -name "$rpm_file_glob"))
+
+if [[ -z "$bin_rpm" && -z "$src_rpm" ]]; then
+  echo "no files found"
+  exit 1
+fi
+
+echo -e "${bold}The following will be uploaded to eupathdb-{{ ansible_distribution_major_version }}-workflow-{{ ansible_architecture }}${reset}"
+for i in ${bin_rpm[@]}; do
+  echo -e ${green}${i}${reset}
+done
+echo
+echo -e "${bold}The following will be uploaded to eupathdb-{{ ansible_distribution_major_version }}-workflow-SRPMS${reset}"
+for i in ${src_rpm[@]}; do
+  echo -e ${green}${i}${reset}
+done
+echo
+echo -n "Continue? y/N  "
+read ans
+case "$(echo -n $ans | tr '[:upper:]' '[:lower:]')" in
+y|yes)
+  ;;
+*)
+  exit 1
+  ;;
+esac
+echo
+
+# If gotten this far then there is at least one file to upload. Check if cert is good
+# for the next 5 minutes and log in if not.
+if openssl x509 -checkend 300 -noout -in ~/.pulp/user-cert.pem 2>/dev/null; then 
+  echo "OK"
+else
+  echo -n "Enter Pulp username: "
+  read username
+  pulp-admin login --username "$username"
+  if [[ $? -gt 0 ]]; then
+    exit 1
+  fi
+fi
+
+if [[ -n "$bin_rpm" ]]; then
+
+  for i in "${bin_rpm[@]}"; do
+    file_opts="$file_opts --file $i"
+  done
+
+  pulp-admin rpm repo uploads rpm \
+    --repo-id eupathdb-{{ ansible_distribution_major_version }}-workflow-{{ ansible_architecture }} \
+    --skip-existing \
+    ${file_opts}
+
+  pulp-admin rpm repo publish run --repo-id eupathdb-{{ ansible_distribution_major_version }}-workflow-{{ ansible_architecture }}
+else
+  echo "No binary rpm files found."
+fi
+
+if [[ -n "$bin_rpm" ]]; then
+  pulp-admin rpm repo uploads rpm \
+    --repo-id eupathdb-{{ ansible_distribution_major_version }}-workflow-SRPMS \
+    --skip-existing \
+    --file ${src_rpm}
+
+  pulp-admin rpm repo publish run --repo-id eupathdb-{{ ansible_distribution_major_version }}-workflow-SRPMS
+else
+  echo "No source rpm files found."
+fi

@@ -61,6 +61,14 @@
     - template: dest=/home/vagrant/.rpmmacros
                 src=templates/rpmmacros.j2
 
+    - file: path=/home/vagrant/bin
+            state=directory
+            owner=vagrant
+    - template: dest=/home/vagrant/bin/upload-workflow-pkg
+                src=templates/upload-workflow-pkg.j2
+                owner=vagrant
+                mode=755
+
     - file: path="{{ rpmbuild_topdir }}/{{ item }}"
             state=directory
       with_items:
