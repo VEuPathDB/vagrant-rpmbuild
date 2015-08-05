@@ -6,14 +6,13 @@
 
 - command: "/usr/bin/update-ca-trust check 2>&1"
   register: ca_trust_enabled
-  changed_when: false
+  changed_when: False
   sudo: no
   when: ansible_distribution_major_version == '6'
 
 - shell: /usr/bin/update-ca-trust enable
-  when: ca_trust_enabled.stdout.find('DISABLED') != -1
   sudo: yes
-  when: ansible_distribution_major_version == '6'
+  when: ca_trust_enabled.stdout.find('DISABLED') != -1 and ansible_distribution_major_version == '6'
   
 - copy: src=files/apidb-ca-rsa.crt
         dest=/etc/pki/ca-trust/source/anchors/
