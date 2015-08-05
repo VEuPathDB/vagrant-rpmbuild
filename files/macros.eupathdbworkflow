@@ -72,10 +72,10 @@ fi\
 %{nil}
 
 ####################################################################################
-# remove _pkg_base dir if empty
+# remove _pkg_base dir if present and empty
 %rm_pkg_base_dir() \
 _PKG_BASE_DIR=$RPM_INSTALL_PREFIX0/%{_software_topdir}/%{_pkg_base} \
-if [ ! "$(ls -A $_PKG_BASE_DIR)" ]; then \
+if [[ -d $_PKG_BASE_DIR && ! "$(ls -A $_PKG_BASE_DIR)" ]]; then \
     rmdir $_PKG_BASE_DIR \
 fi \
 %{nil}
