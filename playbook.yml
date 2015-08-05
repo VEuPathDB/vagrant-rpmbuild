@@ -94,7 +94,9 @@
 
     - copy: src=sensitive/gnupg/
             dest=/home/vagrant/.gnupg
-            mode=700
+            mode=0600
+            force=yes
+            directory_mode=0700
 
     - file: path=/home/vagrant/rpmbuild
             src="{{rpmbuild_topdir}}"
