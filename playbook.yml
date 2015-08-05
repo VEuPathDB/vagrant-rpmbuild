@@ -26,6 +26,7 @@
         - zlib-devel
         - bzip2-devel
         - openssl-devel
+        - libpng-devel
         - ncurses-devel
         - sqlite-devel
         - readline-devel
@@ -93,6 +94,7 @@
 
     - copy: src=sensitive/gnupg/
             dest=/home/vagrant/.gnupg
+            mode=700
 
     - file: path=/home/vagrant/rpmbuild
             src="{{rpmbuild_topdir}}"
@@ -102,7 +104,7 @@
             dest=/etc/rpm/macros.eupathdbworkflow
             owner=root
             group=root
-            mode=-644
+            mode=0644
       sudo: yes
 
     - ini_file: dest=/etc/pulp/admin/admin.conf
