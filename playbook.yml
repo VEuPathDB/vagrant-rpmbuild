@@ -4,7 +4,8 @@
   sudo: no
   gather_facts: True
   vars:
-    rpmbuild_topdir: '/vagrant/scratch/{{ ansible_distribution_major_version }}/rpmbuild'
+    rpmbuild_topdir: '/home/vagrant/rpmbuild'
+    shared_rpmbuild_topdir: '/vagrant/scratch/{{ ansible_distribution_major_version }}/rpmbuild'
     rpmbuild_dist: uga
 
   tasks:
@@ -47,6 +48,8 @@
         - perl-Test-Simple
       sudo: yes
 
+    - include: tasks/rpmbuild.yml
+
     - yum: name="{{ item }}"
       with_items:
         - python27-devel
@@ -67,13 +70,6 @@
                    host='git.apidb.org'
                    key="{{ lookup('pipe','ssh-keyscan git.apidb.org') }}"
 
-    - command: whoami
-      register: local_username
-      delegate_to: 127.0.0.1
-      changed_when: false
-    - template: dest=/home/vagrant/.rpmmacros
-                src=templates/rpmmacros.j2
-
     - file: path=/home/vagrant/bin
             state=directory
             owner=vagrant
@@ -82,32 +78,11 @@
                 owner=vagrant
                 mode=755
 
-    - file: path="{{ rpmbuild_topdir }}/{{ item }}"
-            state=directory
-      with_items:
-        - BUILD
-        - BUILDROOT
-        - RPMS
-        - SOURCES
-        - SPECS
-        - SRPMS
-
     - copy: src=sensitive/gnupg/
             dest=/home/vagrant/.gnupg
             mode=0600
             force=yes
             directory_mode=0700
-
-    - file: path=/home/vagrant/rpmbuild
-            src="{{rpmbuild_topdir}}"
-            state=link
-
-    - copy: src=files/macros.eupathdbworkflow
-            dest=/etc/rpm/macros.eupathdbworkflow
-            owner=root
-            group=root
-            mode=0644
-      sudo: yes
 
     - ini_file: dest=/etc/pulp/admin/admin.conf
                 section=server

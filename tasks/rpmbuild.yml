@@ -1,0 +1,65 @@
+# dirs that can not be on a vboxfs file system because hardlinks are not allowed
+# https://www.virtualbox.org/ticket/818
+- file: path="{{ rpmbuild_topdir }}/{{ item }}"
+        state=directory
+  with_items:
+    - BUILD
+    - BUILDROOT
+
+# These dirs are on a vboxfs file system shared with host
+# to aid debugging, file editing
+- file: path="{{ shared_rpmbuild_topdir }}/{{ item }}"
+        state=directory
+  with_items:
+    - RPMS
+    - SOURCES
+    - SPECS
+    - SRPMS
+
+# symlink from shared dir to rpmbuild_topdir to create a
+# complete rpmbuild directory structure.
+- file: path='{{ item.path }}'
+        src='{{ item.src }}'
+        state=link
+  with_items:
+    - { src: '{{ shared_rpmbuild_topdir }}/RPMS',
+        path: '{{ rpmbuild_topdir }}/RPMS'
+      }
+    - { src: '{{ shared_rpmbuild_topdir }}/SOURCES',
+        path: '{{ rpmbuild_topdir }}/SOURCES'
+      }
+    - { src: '{{ shared_rpmbuild_topdir }}/SPECS',
+        path: '{{ rpmbuild_topdir }}/SPECS'
+      }
+    - { src: '{{ shared_rpmbuild_topdir }}/SRPMS',
+        path: '{{ rpmbuild_topdir }}/SRPMS'
+      }
+
+# symlinks on shared volume to real dirs on guest. These
+# will be invalid links when viewed from the host filesystem.
+- file: path='{{ item.path }}'
+        src='{{ item.src }}'
+        state=link
+  with_items:
+    - { src: '{{ rpmbuild_topdir }}/BUILD',
+        path: '{{ shared_rpmbuild_topdir }}/BUILD'
+      }
+    - { src: '{{ rpmbuild_topdir }}/BUILDROOT',
+        path: '{{ shared_rpmbuild_topdir }}/BUILDROOT'
+      }
+
+
+- command: whoami
+  register: local_username
+  delegate_to: 127.0.0.1
+  changed_when: false
+- template: dest=/home/vagrant/.rpmmacros
+            src=templates/rpmmacros.j2
+
+- copy: src=files/macros.eupathdbworkflow
+        dest=/etc/rpm/macros.eupathdbworkflow
+        owner=root
+        group=root
+        mode=0644
+  sudo: yes
+
