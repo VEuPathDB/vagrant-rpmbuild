@@ -2,7 +2,7 @@ Very draft environment for building RPMs. Vagrant setups a base system for runni
 
 ## Setup
 
-Before vagrant provisioning, copy the `modules/rpm_build/files/gnupg` directory from our Puppet repo to `sensitive/gnupg` of this Vagrant project. These files are used when signing the rpm files.
+Before vagrant provisioning, copy the `modules/rpm_build/files/gnupg` directory from our Puppet repo to `sensitive/gnupg` of this Vagrant project. These files are used when signing the rpm files. These files should not be committed to GitHub (they are excluded in the `.gitignore` file).
 
 
 ## 
