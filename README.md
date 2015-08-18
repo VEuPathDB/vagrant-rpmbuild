@@ -5,6 +5,28 @@ Very draft environment for building RPMs. Vagrant setups a base system for runni
 Before vagrant provisioning, copy the `modules/rpm_build/files/gnupg` directory from our Puppet repo to `sensitive/gnupg` of this Vagrant project.
 
 
+## 
+
+This vagrant project supports CentOS 6 and CentOS 7 vms. Running
+
+    vagrant up
+
+will start and provision both machines. If you want to work with individual machines, specify `el6` (CentOS 6) or `el7` (CentOS 7) names.
+
+    vagrant up el6
+
+or
+
+    vagrant up el7
+
+
+The `el6` or `el7` names must be specified when running `vagrant ssh`
+
+    vagrant ssh el6
+or
+
+    vagrant ssh el7
+
 ## Shared volumes
 
 Problems with sharing directories between host OS and guest VM.
