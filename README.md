@@ -1,8 +1,8 @@
 Very draft environment for building RPMs. Vagrant setups a base system for running `rpmbuild` and uploading with the packages to our Pulp repository.
 
-The `deps/` directory houses Ansible playbooks that install build dependencies for individual modules. You can load them like so:
+## Setup
 
-    bin/prepdeps deps/python27.yml
+Before vagrant provisioning, copy the `modules/rpm_build/files/gnupg` directory from our Puppet repo to `sensitive/gnupg` of this Vagrant project.
 
 
 ## Shared volumes
@@ -23,3 +23,9 @@ and `BUILDROOT` are on a native filesystem and the other subdirectories are on
 the shared volume for easy access by host editors and so files (especially spec
 files) survive a `vagrant destroy`. Symbolic links are used to complete the
 `rpmbuild` directory structure.
+
+## Experimental
+
+The `deps/` directory houses Ansible playbooks that install build dependencies for individual modules. You can load them like so:
+
+    bin/prepdeps deps/python27.yml
