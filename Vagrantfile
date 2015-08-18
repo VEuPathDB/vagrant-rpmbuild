@@ -1,17 +1,22 @@
 WF_SERVERS = {
   :el7 => {
     :vagrant_box     => 'puppetlabs/centos-7.0-64-nocm',
-    :wf_hostname     => 'package-7-64',
+    :wf_hostname     => 'package-7-64.vm',
   },
   :el6 => {
     :vagrant_box     => 'puppetlabs/centos-6.6-64-nocm',
-    :wf_hostname     => 'package-6-64',
+    :wf_hostname     => 'package-6-64.vm',
   }
 }
 
 Vagrant.configure(2) do |config|
 
   config.ssh.forward_agent = true
+
+  if Vagrant.has_plugin?('landrush')
+   config.landrush.enabled = true
+   config.landrush.tld = 'vm'
+  end
 
   WF_SERVERS.each do |name,cfg|
     config.vm.define name do |vm_config|
