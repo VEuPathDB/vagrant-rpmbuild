@@ -15,9 +15,12 @@
   when: ansible_distribution_major_version == '6' and ca_trust_enabled.stdout.find('DISABLED') != -1
   
 - copy: src=files/apidb-ca-rsa.crt
-        dest=/etc/pki/ca-trust/source/anchors/
+        dest='{{ item }}'
   register: ca_crt
   sudo: yes
+  with_items:
+    - /etc/pki/ca-trust/source/anchors
+    - /etc/pki/tls/certs
 
 - command: /usr/bin/update-ca-trust
   when: ca_crt.changed
