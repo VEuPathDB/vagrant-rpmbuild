@@ -37,14 +37,22 @@ source `tar.gz` files. This is an issue with `rpmbuild` doing specific file owne
 checks; manually running `tar` on the source files works fine.
 
 The default `vboxfs` VirtualBox sharing is slower than NFS and can be a problem with
-very large source code compiles. In general though it is not much worse than a
-native filesystem. The issue with `vboxfs` is that hard links are not allowed
+very large source code compiles. For most software packaging though it is not much worse than a native filesystem.
+
+A bigger problem with `vboxfs` is that hard links are not allowed
 on the shared volume (https://www.virtualbox.org/ticket/818) and some software
-requires them. Therefore the `rpmbuild` directory is constructed so the `BUILD`
+requires them. Therefore the `rpmbuild` directory on these VMs is constructed so the `BUILD`
 and `BUILDROOT` are on a native filesystem and the other subdirectories are on
 the shared volume for easy access by host editors and so files (especially spec
-files) survive a `vagrant destroy`. Symbolic links are used to complete the
+files) survive a `vagrant destroy`. Soft symbolic links are used to complete the
 `rpmbuild` directory structure.
+
+In some cases, running `make install` on a vboxsf shared volume that is provided by a case-preserving, case-insensitive OS X host volume can result in the message
+
+    make: `install' is up to date.
+
+because the source code comes with an `INSTALL` file which validates against make's test for an `install` file. The workaround is to avoid compiling on shared volumes or, better, make a case-sensitive partition on your OS X and host your Vagrant project there (the partition does not need to be very big. It needs to be big enough to hold source code builds, it does not need to store virtual machine disk images).
+
 
 ## Experimental
 
