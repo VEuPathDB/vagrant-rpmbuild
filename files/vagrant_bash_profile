@@ -1,0 +1,17 @@
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+PATH=$PATH:$HOME/bin
+
+export PATH
+
+# Paired with .bash_logout recording $PWD,
+# set OLDPWD to the working directory in use
+# at last logout. This is to aid logging out
+# to the host and then resuming when back
+# in the VM; just run "cd -".
+if [[ -f ~/.lastdir ]]; then
+  export OLDPWD="$(cat ~/.lastdir)"
+fi

@@ -1,0 +1,5 @@
+
+# record $PWD so we can readily access
+# it on next login; .bash_profile uses
+# the value to set $OLDPWD.
+echo $PWD > ~/.lastdir

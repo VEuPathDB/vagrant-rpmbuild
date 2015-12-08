@@ -66,6 +66,19 @@
 
     - include: tasks/apidb-ca.yml
 
+    - name: install vagrant dot files
+      copy: src='{{ item.src }}'
+            dest='/home/vagrant/{{ item.dest }}'
+            owner=vagrant
+            mode=0644
+      with_items:
+        - { src: 'files/vagrant_bash_profile',
+            dest: '.bash_profile'
+          }
+        - { src: 'files/vagrant_bash_logout',
+            dest: '.bash_logout'
+          }
+
     - name: add git host to known_hosts
       known_hosts: path="/home/vagrant/.ssh/known_hosts"
                    host='git.apidb.org'
