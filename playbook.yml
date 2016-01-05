@@ -47,6 +47,7 @@
         - cpanspec
         - perl-ExtUtils-MakeMaker
         - perl-Test-Simple
+        - redhat-lsb-core
       sudo: yes
 
     - include: tasks/rpmbuild.yml
