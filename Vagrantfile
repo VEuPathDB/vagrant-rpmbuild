@@ -1,6 +1,6 @@
 WF_SERVERS = {
   :el7 => {
-    :vagrant_box     => 'puppetlabs/centos-7.2-64-nocm',
+    :vagrant_box     => 'ebrc/centos-7-64-puppet',
     :wf_hostname     => 'package-7-64.vm',
   },
   :el6 => {
