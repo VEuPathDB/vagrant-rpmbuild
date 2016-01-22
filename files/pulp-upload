@@ -1,0 +1,147 @@
+#!/bin/bash
+
+# pulp-admin is not pre-packaged for CentOS 5 so this is a
+# quick and dirty shell script to upload RPMs to a pulp repo.
+# It does not support the other pulp-admin functions; use
+# a CentOS 6+ for those needs.
+#
+# Requires: bash, curl, jq
+
+PULP_SERVER=pulp.uga.apidb.org
+REST_PATH="/pulp/api/v2/content/"
+
+# this script is only for rhel release 5
+LSB_RELEASE="$(lsb_release -sr)"
+if [[ ${LSB_RELEASE%%.*} -gt 5 ]]; then 
+  echo 'This script is for RHEL/CentOS release 5.x.'
+  echo "For release $LSB_RELEASE, use pulp-admin."
+  exit 1
+fi
+
+########################################################################################
+
+function file_exists_on_server() {
+  local rpmfile="$1"
+  curl -s -u ${LOGIN}:${PASSWD} \
+    -X POST "https://@${PULP_SERVER}${REST_PATH}/units/rpm/search/" \
+    -d "{\"criteria\": { \"filters\": {\"filename\": {\"\$in\": [\"$rpmfile\"]}}, \"fields\": [\"filename\"]}}" \
+  | grep -q "$rpmfile"
+  return $?
+}
+
+function show_help() {
+  echo  "--repo-id       - (required) name of repository"
+  echo  "--file          - (required) path to RPM"
+  echo  "--username      - (required) login name"
+  echo  "--skip-existing - (optional) do not upload if name exists on server"
+  exit 1
+}
+
+function delete_upload_id() {
+  local upload_id="$1"
+  echo -e '\E[32m'"\033[1mCleaning up task id '${upload_id}' ...\033[0m"   
+  # Delete upload_id (should not need to do if above import_upload completes).
+  # The trailing slash after upload_id is critical
+  curl -f -H "Accept: application/json" \
+    -u "$LOGIN:$PASSWD"  \
+    -X DELETE \
+    "https://${PULP_SERVER}${REST_PATH}/uploads/${upload_id}/"
+  echo
+}
+########################################################################################
+
+if ! which jq > /dev/null; then
+  echo "jq (json parser) not found."
+  echo "There is no jq RPM for CentOS 5 so"
+  echo "copy a binary from a CentOS 6 server in to ~/bin ."
+  exit 1
+fi
+
+# pick out and remove non-positional options
+unset REPO_ID PATH_TO_RPM LOGIN SKIP_EXISTING
+until [ -z "$*" ]; do
+    arg=$1
+    if   [[ "$arg" == "--repo-id" ]]; then
+      shift
+      REPO_ID=$1
+    elif [[ "$arg" == "--file" || "$arg" == "-f" ]]; then
+      shift
+      PATH_TO_RPM=$1
+    elif [[ "$arg" == "--username" || "$arg" == "-u" ]]; then
+      shift
+      LOGIN=$1
+    elif [[ "$arg" == "--skip-existing" ]]; then
+      SKIP_EXISTING=1
+    elif [[ "$arg" == "--help" || "$arg" == "-h" ]]; then
+      show_help
+    fi
+
+    shift
+
+done
+
+[[ -z "$LOGIN"       ]] && show_help
+[[ -z "$PATH_TO_RPM" ]] && show_help
+[[ -z "$REPO_ID"     ]] && show_help
+
+RPM_FILE_NAME="$(basename "$PATH_TO_RPM")"
+
+read -s -p "Password: " PASSWD; echo
+
+# Request UPLOAD_ID
+echo "Requesting upload id ..."
+resp="$(curl -f -s  -H "Accept: application/json" -X POST -u ${LOGIN}:${PASSWD} "https://${PULP_SERVER}${REST_PATH}/uploads/")"
+
+if [[ $? -ne 0 ]]; then
+  echo -e '\E[31m'"\033[1mFailed upload_id request (check username, password).\033[0m"   
+  exit 1
+fi
+
+UPLOAD_ID="$(jq -r '. | .upload_id' <<< $resp)"
+
+echo -e '\E[32m'"\033[1mGot upload id '${UPLOAD_ID}'.\033[0m"   
+
+if file_exists_on_server $RPM_FILE_NAME; then
+  if [[ "$SKIP_EXISTING" == "1" ]]; then
+    echo -e '\E[32m'"\033[1mFound existing '${RPM_FILE_NAME}' on server, not uploading.\033[0m"   
+    DO_UPLOAD=0
+    exit 0
+  else
+    echo -e '\E[32m'"\033[1mFound existing '${RPM_FILE_NAME}' on server, overwriting.\033[0m"   
+    DO_UPLOAD=1
+  fi
+else
+  DO_UPLOAD=1
+fi;
+
+if [[ "$DO_UPLOAD" == "1" ]]; then
+  # upload RPM
+  echo -e '\E[32m'"\033[1mUploading '${RPM_FILE_NAME}' ... \033[0m"   
+  curl -f -H "Accept: application/json" \
+    -X PUT \
+    --data-binary @${PATH_TO_RPM} \
+    -u "${LOGIN}:${PASSWD}"  \
+    "https://${PULP_SERVER}${REST_PATH}/uploads/${UPLOAD_ID}/0/"
+echo
+
+  if [[ $? -ne 0 ]]; then
+    echo -e '\E[31m'"\033[1mFailed to upload '${PATH_TO_RPM}'.\033[0m"   
+    exit 1
+  fi
+fi
+
+# associate with a REPOD_ID
+echo -e '\E[32m'"\033[1mAdding '${RPM_FILE_NAME}' to repo '${REPO_ID}' ... \033[0m"   
+curl -f -H "Accept: application/json" \
+  -u "${LOGIN}:${PASSWD}"  \
+  -X POST \
+  -d "{\"override_config\": {}, \"unit_type_id\": \"rpm\",  \"upload_id\": \"${UPLOAD_ID}\", \"unit_key\": {}, \"unit_metadata\": {\"checksum_type\": null}}" \
+  "https://${PULP_SERVER}/pulp/api/v2/repositories/${REPO_ID}/actions/import_upload/"
+echo
+
+if [[ $? -ne 0 ]]; then
+  echo -e '\E[31m'"\033[1mFailed to add to '${REPO_ID}'.\033[0m"   
+  exit 1
+fi
+
+delete_upload_id "$UPLOAD_ID"

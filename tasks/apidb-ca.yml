@@ -1,5 +1,6 @@
 # update-ca-trust in EL7 does not support check, enable commands, doesn't
 # seem to require to be enabled.
+# ca-certificates is not packaged for EL5.
 
 - yum: name=ca-certificates
   sudo: yes

@@ -1,4 +1,12 @@
+# Add EuPathDB YUM repos.
+# CentOS 5 YUM requires python-hashlib to handle sha256-signed YUM repo
+# data (avoiding "Error performing checksum")
 
+- name: install python-hashlib for sha256 YUM checksums
+  yum: name="{{ item }}"
+  with_items:
+    - python-hashlib
+  when: ansible_distribution_major_version == '5'
 
 - copy: src=files/RPM-GPG-KEY-EUPATHDB
         dest=/etc/pki/rpm-gpg/RPM-GPG-KEY-EUPATHDB

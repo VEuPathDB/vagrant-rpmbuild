@@ -1,0 +1,58 @@
+#!/bin/bash
+
+
+PULP_SERVER=pulp.uga.apidb.org
+REST_PATH="/pulp/api/v2/content/"
+
+# this script is only for rhel release 5
+LSB_RELEASE="$(lsb_release -sr)"
+if [[ ${LSB_RELEASE%%.*} -gt 5 ]]; then 
+  echo 'This script is for RHEL/CentOS release 5.x.'
+  echo "For release $LSB_RELEASE, use pulp-admin."
+  exit 1
+fi
+
+########################################################################################
+
+function show_help() {
+  echo  "--repo-id       - (required) name of repository"
+  echo  "--username      - (required) login name"
+  exit 1
+}
+
+########################################################################################
+
+unset REPO_ID PATH_TO_RPM LOGIN SKIP_EXISTING
+until [ -z "$*" ]; do
+    arg=$1
+    if   [[ "$arg" == "--repo-id" ]]; then
+      shift
+      REPO_ID=$1
+    elif [[ "$arg" == "--username" || "$arg" == "-u" ]]; then
+      shift
+      LOGIN=$1
+    elif [[ "$arg" == "--help" || "$arg" == "-h" ]]; then
+      show_help
+    fi
+
+    shift
+
+done
+
+[[ -z "$LOGIN"       ]] && show_help
+[[ -z "$REPO_ID"     ]] && show_help
+
+read -s -p "Password: " PASSWD; echo
+
+echo -e '\E[32m'"\033[1mPublishing to  '${REPO_ID}' ...\033[0m"   
+curl -f -H "Accept: application/json" \
+  -u "${LOGIN}:${PASSWD}"  \
+  -X POST \
+  -d "{\"id\": \"yum_distributor\", \"override_config\": {}}" \
+  "https://${PULP_SERVER}/pulp/api/v2/repositories/${REPO_ID}/actions/publish/"
+
+if [[ $? -ne 0 ]]; then
+  echo -e '\E[31m'"\033[1mFailed to publish to '${REPO_ID}'.\033[0m"   
+  exit 1
+fi
+
