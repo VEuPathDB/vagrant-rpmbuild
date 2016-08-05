@@ -20,6 +20,12 @@ Vagrant.configure(2) do |config|
   WF_SERVERS.each do |name,cfg|
     config.vm.define name do |vm_config|
 
+      vm_config.vm.provider "virtualbox" do |v|
+        v.memory = 2048
+        v.cpus = 2
+        v.customize ["modifyvm", :id, "--ioapic", "on"]
+      end
+
       vm_config.vm.box      = cfg[:vagrant_box] if cfg[:vagrant_box]
       vm_config.vm.hostname = cfg[:wf_hostname] if cfg[:wf_hostname]
 
