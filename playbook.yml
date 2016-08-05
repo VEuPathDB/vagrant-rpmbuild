@@ -36,6 +36,7 @@
         - gdbm-devel
         - git
         - libpcap-devel
+        - libcurl-devel
         - libpng-devel
         - libxml2-devel
         - ncurses-devel
