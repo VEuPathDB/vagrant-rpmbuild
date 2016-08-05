@@ -29,25 +29,26 @@
 
     - yum: name="{{ item }}"
       with_items:
-        - git
-        - gcc-c++
-        - zlib-devel
         - bzip2-devel
-        - openssl-devel
-        - libpng-devel
-        - ncurses-devel
-        - sqlite-devel
-        - readline-devel
-        - tk-devel
-        - gdbm-devel
+        - cpanspec
         - db4-devel
+        - gcc-c++
+        - gdbm-devel
+        - git
         - libpcap-devel
-        - xz-devel
+        - libpng-devel
+        - libxml2-devel
+        - ncurses-devel
+        - openssl-devel
+        - python-virtualenv
+        - readline-devel
         - rpm-build
         - rpmdevtools
         - rubygem-gem2rpm
-        - python-virtualenv
-        - cpanspec
+        - sqlite-devel
+        - tk-devel
+        - xz-devel
+        - zlib-devel
       become: yes
 
     - yum: name="{{ item }}"
