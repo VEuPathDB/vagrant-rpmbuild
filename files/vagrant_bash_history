@@ -1,0 +1,16 @@
+for i in `find ~/rpmbuild/RPMS/ -follow -name '*.rpm' `; do rpmsign $i; done;
+function ba {   pkg="$1";   rpmbuild -ba "R-${pgk}.spec"; }
+function r2spec {   R2spec -p "$1" --no-suggest  --no-check --name 'Mark Heiges' --email 'mheiges@uga.edu'; }
+pulp-admin  rpm repo content rpm --repo-id eupathdb-7-x86_64 --fields='name,version' --match='name=^MUM'
+pulp-admin  rpm repo remove rpm --repo-id eupathdb-7-workflow-SRPMS  --match 'filename=R-bitops-1.0.6-1uga.src.rpm'
+pulp-admin login -u mheiges
+pulp-admin orphan list --type=rpm --details
+pulp-admin orphan remove --type=rpm
+pulp-admin repo list --details
+pulp-admin rpm repo uploads rpm --repo-id eupathdb-7-x86_64 --file fpc-2.4.0-1.x86_64.rpm --skip-existing
+pulp-admin rpm repo uploads rpm --repo-id eupathdb-7-SRPMS --dir /home/vagrant/rpmbuild/SRPMS/ --skip-existing
+pulp-admin tasks list
+R2spec -p bitops --no-suggest  --no-check --name 'Mark Heiges' --email 'mheiges@uga.edu'
+rpm --addsign  /home/vagrant/rpmbuild/RPMS/x86_64/mod_auth_tkt-*
+rpmbuild --rebuild -ba MUMmer-3.23-3.23-2uga.src.rpm 
+rpmbuild -ba --sign R-bitops.spec 
