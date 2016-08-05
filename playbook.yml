@@ -83,11 +83,9 @@
     - include: tasks/apidb-ca-el5.yml
       when: ansible_distribution_major_version == '5'
 
-    - name: install vagrant dot files
-      copy: src='{{ item.src }}'
-            dest='/home/vagrant/{{ item.dest }}'
-            owner=vagrant
-            mode=0644
+    - name: check for existing dot files for vagrant user
+      stat: path='{{ item.dest }}'
+      register: dotfiles
       with_items:
         - { src: 'files/vagrant_bash_profile',
             dest: '.bash_profile'
@@ -98,6 +96,14 @@
         - { src: 'files/vagrant_bash_history',
             dest: '.bash_history'
           }
+
+    - name: install dot files for vagrant user
+      copy: src='{{ item.item.src }}'
+            dest='/home/vagrant/{{ item.item.dest }}'
+            owner=vagrant
+            mode=0644
+      when: item.stat.exists == false
+      with_items: '{{ dotfiles.results }}'
 
     - name: add git host to known_hosts
       known_hosts: path="/home/vagrant/.ssh/known_hosts"
