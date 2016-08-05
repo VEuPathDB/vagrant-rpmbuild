@@ -15,3 +15,5 @@ export PATH
 if [[ -f ~/.lastdir ]]; then
   export OLDPWD="$(cat ~/.lastdir)"
 fi
+
+export PS1='\n[$(date +"%H:%M %Y%m%d") \u@\h \w]\n\$ '
