@@ -3,15 +3,15 @@
 
 - command: mv /etc/pki/tls/certs/ca-bundle.crt /etc/pki/tls/certs/ca-bundle.crt.dist
   when: not bundle_dist.stat.exists
-  sudo: yes
+  become: yes
 
 - copy: src=files/apidb-ca-rsa.crt
         dest='{{ item }}'
   register: ca_crt
-  sudo: yes
+  become: yes
   with_items:
     - /etc/pki/tls/certs
 
 - shell: 'cat /etc/pki/tls/certs/ca-bundle.crt.dist /etc/pki/tls/certs/apidb-ca-rsa.crt >> /etc/pki/tls/certs/ca-bundle.crt'
   when: ca_crt.changed
-  sudo: yes
+  become: yes

@@ -1,7 +1,7 @@
 # bootstrap VM with pre-Puppet tasks
 ---
 - hosts: all
-  sudo: no
+  become: no
   gather_facts: True
   vars:
     rpmbuild_topdir: '/home/vagrant/rpmbuild'
@@ -13,19 +13,19 @@
     - name: install python-ssl for python 2.4 SSL validation
       yum:  name=python-ssl
       when: ansible_distribution_major_version == '5'
-      sudo: yes
+      become: yes
 
     - include: tasks/eupathdb-yumrepo.yml
       when: ansible_distribution_major_version > '5'
-      sudo: yes
+      become: yes
 
     - get_url: url=https://repos.fedorapeople.org/repos/pulp/pulp/rhel-pulp.repo
                dest=/etc/yum.repos.d/pulp-v2-stable.repo
       when: ansible_distribution_major_version > '5'
-      sudo: yes
+      become: yes
 
     - yum: name=epel-release
-      sudo: yes
+      become: yes
 
     - yum: name="{{ item }}"
       with_items:
@@ -48,7 +48,7 @@
         - rubygem-gem2rpm
         - python-virtualenv
         - cpanspec
-      sudo: yes
+      become: yes
 
     - yum: name="{{ item }}"
       with_items:
@@ -60,21 +60,22 @@
         - python-pip
         - redhat-lsb-core
       when: ansible_distribution_major_version > '5'
-      sudo: yes
+      become: yes
 
     - include: tasks/rpmbuild.yml
+    - include: tasks/R2spec.yml
 
     - yum: name="{{ item }}"
       with_items:
         - python27-devel
-      sudo: yes
+      become: yes
       when: ansible_distribution_major_version == '6'
 
     - yum: name="{{ item }}"
       with_items:
         - python-devel
         - rpm-sign
-      sudo: yes
+      become: yes
       when: ansible_distribution_major_version == '7'
 
     - include: tasks/apidb-ca.yml
@@ -93,6 +94,9 @@
           }
         - { src: 'files/vagrant_bash_logout',
             dest: '.bash_logout'
+          }
+        - { src: 'files/vagrant_bash_history',
+            dest: '.bash_history'
           }
 
     - name: add git host to known_hosts
@@ -119,7 +123,7 @@
                 option="{{ item.option }}"
                 value="{{ item.value }}"
       when: ansible_distribution_major_version > '5'
-      sudo: yes
+      become: yes
       with_items:
         - { option: 'host',
             value: 'pulp.uga.apidb.org'

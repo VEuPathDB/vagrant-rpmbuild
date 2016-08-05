@@ -1,5 +1,5 @@
 - hosts: all
-  sudo: yes
+  become: yes
   gather_facts: False
 
   tasks:
@@ -10,11 +10,11 @@
 
     - git: repo=https://github.com/mheiges/vagrant-libvirt-rpm
            dest="{{ rpmbuild_topdir }}/SPECS"
-      sudo: no
+      become: no
 
     - copy: src="{{ rpmbuild_topdir }}/SPECS/vagrant-libvirt-rpm/{{ item }}"
             dest="{{ rpmbuild_topdir }}/SOURCES/
-      sudo: no
+      become: no
       with_items:
         - rubygem-vagrant-libvirt.spec
         - vagrant-libvirt-nokogiri-version.patch

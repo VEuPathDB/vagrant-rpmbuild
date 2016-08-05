@@ -3,26 +3,26 @@
 # ca-certificates is not packaged for EL5.
 
 - yum: name=ca-certificates
-  sudo: yes
+  become: yes
 
 - command: "/usr/bin/update-ca-trust check 2>&1"
   register: ca_trust_enabled
   changed_when: False
-  sudo: no
+  become: no
   when: ansible_distribution_major_version == '6'
 
 - shell: /usr/bin/update-ca-trust enable
-  sudo: yes
+  become: yes
   when: ansible_distribution_major_version == '6' and ca_trust_enabled.stdout.find('DISABLED') != -1
   
 - copy: src=files/apidb-ca-rsa.crt
         dest='{{ item }}'
   register: ca_crt
-  sudo: yes
+  become: yes
   with_items:
     - /etc/pki/ca-trust/source/anchors
     - /etc/pki/tls/certs
 
 - command: /usr/bin/update-ca-trust
   when: ca_crt.changed
-  sudo: yes
+  become: yes
