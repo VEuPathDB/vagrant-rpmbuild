@@ -57,9 +57,10 @@ find %{buildroot}%{rlibdir}/%{packname} -type d -name unitTests -print0 | xargs 
 find %{buildroot}%{rlibdir}/%{packname} -type d -name tests -print0 | xargs -0 rm -rf --
 find %{buildroot}%{rlibdir}/%{packname} -type d -name demo -print0 | xargs -0 rm -rf --
 find %{buildroot}%{rlibdir}/%{packname} -type d -name examples -print0 | xargs -0 rm -rf --
+find %{buildroot}%{rlibdir}/%{packname} -type d -name extdata -print0 | xargs -0 rm -rf --
 # Patch files that may contain build_root (detected by check-buildroot script), the grep excludes binary files
 find %{buildroot} -type f -exec grep -Il . {} \; | xargs sed -i "s|%{buildroot}||g"
-find %{buildroot} -type f | sed "s|%{buildroot}||" | tee filelist
+find %{buildroot} -type f | sed "s|%{buildroot}||" | sed 's/^/"/g' | sed 's/$/"/g' | tee filelist
 
 %clean
 rm -rf %{buildroot}
