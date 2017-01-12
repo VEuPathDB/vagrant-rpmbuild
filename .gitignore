@@ -5,3 +5,4 @@ scratch/*
 sensitive/*
 !sensitive/README
 !.gitignore
+playbook.retry
