@@ -8,14 +8,17 @@
     - python-hashlib
   when: ansible_distribution_major_version == '5'
 
-- copy: src=files/RPM-GPG-KEY-EUPATHDB
+- name: install RPM-GPG-KEY-EUPATHDB
+  copy: src=files/RPM-GPG-KEY-EUPATHDB
         dest=/etc/pki/rpm-gpg/RPM-GPG-KEY-EUPATHDB
   register: gpgkeyeupathdb
 
-- command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EUPATHDB
+- name: import RPM-GPG-KEY-EUPATHDB
+  command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EUPATHDB
   when: gpgkeyeupathdb.changed
 
-- template: src='{{ item.src }}'
+- name: configure eupath YUM repos
+  template: src='{{ item.src }}'
             dest='{{ item.dest }}'
             force=yes
   with_items: 

@@ -1,6 +1,7 @@
 # dirs that can not be on a vboxfs file system because hardlinks are not allowed
 # https://www.virtualbox.org/ticket/818
-- file: path="{{ rpmbuild_topdir }}/{{ item }}"
+- name: make rpmbuild directories on guest VM
+  file: path="{{ rpmbuild_topdir }}/{{ item }}"
         state=directory
   with_items:
     - BUILD
@@ -8,7 +9,8 @@
 
 # These dirs are on a vboxfs file system shared with host
 # to aid debugging, file editing
-- file: path="{{ shared_rpmbuild_topdir }}/{{ item }}"
+- name: make rpmbuild directories shared from host
+  file: path="{{ shared_rpmbuild_topdir }}/{{ item }}"
         state=directory
   with_items:
     - RPMS
@@ -18,7 +20,8 @@
 
 # symlink from shared dir to rpmbuild_topdir to create a
 # complete rpmbuild directory structure.
-- file: path='{{ item.path }}'
+- name: symlink rpmbuild directories shared from host
+  file: path='{{ item.path }}'
         src='{{ item.src }}'
         state=link
   with_items:
@@ -37,7 +40,8 @@
 
 # symlinks on shared volume to real dirs on guest. These
 # will be invalid links when viewed from the host filesystem.
-- file: path='{{ item.path }}'
+- name: symlink rpmbuild directories shared from guest
+  file: path='{{ item.path }}'
         src='{{ item.src }}'
         state=link
   with_items:
@@ -49,14 +53,17 @@
       }
 
 
-- command: whoami
+- name: register whoami
+  command: whoami
   register: local_username
   delegate_to: 127.0.0.1
   changed_when: false
-- template: dest=/home/vagrant/.rpmmacros
+- name: configure .rpmmacros
+  template: dest=/home/vagrant/.rpmmacros
             src=templates/rpmmacros.j2
 
-- copy: src=files/macros.eupathdbworkflow
+- name: configure macros.eupathdbworkflow
+  copy: src=files/macros.eupathdbworkflow
         dest=/etc/rpm/macros.eupathdbworkflow
         owner=root
         group=root

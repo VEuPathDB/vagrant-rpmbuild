@@ -10,24 +10,28 @@
 
   tasks:
 
-    - name: install python-ssl for python 2.4 SSL validation
+    - name: install python-ssl for python 2.4 SSL validation for EL5
       yum:  name=python-ssl
       when: ansible_distribution_major_version == '5'
       become: yes
 
-    - include: tasks/eupathdb-yumrepo.yml
+    - name: Add EuPathDB YUM repos (skip if EL5)
+      include: tasks/eupathdb-yumrepo.yml
       when: ansible_distribution_major_version > '5'
       become: yes
 
-    - get_url: url=https://repos.fedorapeople.org/repos/pulp/pulp/rhel-pulp.repo
+    - name: Add Pulp YUM repo (skip if EL5)
+      get_url: url=https://repos.fedorapeople.org/repos/pulp/pulp/rhel-pulp.repo
                dest=/etc/yum.repos.d/pulp-v2-stable.repo
       when: ansible_distribution_major_version > '5'
       become: yes
 
-    - yum: name=epel-release
+    - name: Add EPEL YUM repo
+      yum: name=epel-release
       become: yes
 
-    - yum: name="{{ item }}"
+    - name: install devel packages
+      yum: name="{{ item }}"
       with_items:
         - bzip2-devel
         - cpanspec
@@ -53,7 +57,8 @@
         - zlib-devel
       become: yes
 
-    - yum: name="{{ item }}"
+    - name: install Pulp client packages
+      yum: name="{{ item }}"
       with_items:
         - perl-ExtUtils-MakeMaker
         - perl-Test-Simple
@@ -68,13 +73,15 @@
     - include: tasks/rpmbuild.yml
     - include: tasks/R2spec.yml
 
-    - yum: name="{{ item }}"
+    - name: install python27 devel packages for EL6
+      yum: name="{{ item }}"
       with_items:
         - python27-devel
       become: yes
       when: ansible_distribution_major_version == '6'
 
-    - yum: name="{{ item }}"
+    - name: install python devel packages for EL7
+      yum: name="{{ item }}"
       with_items:
         - python-devel
         - rpm-sign
@@ -113,21 +120,25 @@
                    host='git.apidb.org'
                    key="{{ lookup('pipe','ssh-keyscan -p 2112 git.apidb.org') }}"
 
-    - file: path=/home/vagrant/bin
+    - name: mkdir /home/vagrant/bin
+      file: path=/home/vagrant/bin
             state=directory
             owner=vagrant
-    - template: dest=/home/vagrant/bin/upload-workflow-pkg
+    - name: install upload-workflow-pkg script
+      template: dest=/home/vagrant/bin/upload-workflow-pkg
                 src=templates/upload-workflow-pkg.j2
                 owner=vagrant
                 mode=755
 
-    - copy: src=sensitive/gnupg/
+    - name: install gnupg keys
+      copy: src=sensitive/gnupg/
             dest=/home/vagrant/.gnupg
             mode=0600
             force=yes
             directory_mode=0700
 
-    - ini_file: dest=/etc/pulp/admin/admin.conf
+    - name: configure Pulp admin
+      ini_file: dest=/etc/pulp/admin/admin.conf
                 section=server
                 option="{{ item.option }}"
                 value="{{ item.value }}"

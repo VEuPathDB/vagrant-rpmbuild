@@ -1,5 +1,6 @@
 
-- yum: name="{{ item }}"
+- name: install R2Spec
+  yum: name="{{ item }}"
   with_items:
         - R2spec
   become: yes

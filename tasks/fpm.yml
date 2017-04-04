@@ -1,0 +1,13 @@
+# install FPM
+# https://github.com/jordansissel/fpm
+
+- name: install FPM dependencies
+  yum: name="{{ item }}"
+  with_items:
+        - ruby-devel
+  become: yes
+
+- name: install FPM gem
+  gem: name=fpm
+       state=latest
+  become: no
