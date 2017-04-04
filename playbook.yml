@@ -111,7 +111,7 @@
     - name: add git host to known_hosts
       known_hosts: path="/home/vagrant/.ssh/known_hosts"
                    host='git.apidb.org'
-                   key="{{ lookup('pipe','ssh-keyscan git.apidb.org') }}"
+                   key="{{ lookup('pipe','ssh-keyscan -p 2112 git.apidb.org') }}"
 
     - file: path=/home/vagrant/bin
             state=directory
