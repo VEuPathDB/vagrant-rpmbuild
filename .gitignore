@@ -2,7 +2,7 @@
 .vagrant
 puppet
 scratch/*
-sensitive/*
-!sensitive/README
+*/sensitive/*
+!*/sensitive/README
 !.gitignore
 playbook.retry

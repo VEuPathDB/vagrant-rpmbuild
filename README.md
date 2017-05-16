@@ -5,7 +5,7 @@ repository.
 ## Setup
 
 Before vagrant provisioning, copy the `modules/rpm_build/files/gnupg`
-directory from our Puppet 3 repo to `sensitive/gnupg` of this Vagrant
+directory from our Puppet 3 repo to `ansible/sensitive/gnupg` of this Vagrant
 project. These files are used when signing the rpm files. These files
 should not be committed to GitHub (they are excluded in the `.gitignore`
 file).

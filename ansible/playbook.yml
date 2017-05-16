@@ -9,6 +9,14 @@
 
   tasks:
 
+    - name: check for gpg signing keys on local Ansible host
+      local_action: stat path=sensitive/gnupg
+      register: stat_gpg_present
+
+    - fail:
+        msg: Directory `sensitive/gnupg` not found. See README.md for instructions.
+      when: stat_gpg_present.stat.exists == False
+
     - name: install python-ssl for python 2.4 SSL validation for EL5
       yum:
         name: python-ssl
