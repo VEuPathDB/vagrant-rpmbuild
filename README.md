@@ -1,8 +1,14 @@
-Very draft environment for building RPMs. Vagrant setups a base system for running `rpmbuild` and uploading with the packages to our Pulp repository.
+An environment for building RPMs. Vagrant setups a base system for
+running `rpmbuild` and uploading with the packages to our Pulp
+repository.
 
 ## Setup
 
-Before vagrant provisioning, copy the `modules/rpm_build/files/gnupg` directory from our Puppet repo to `sensitive/gnupg` of this Vagrant project. These files are used when signing the rpm files. These files should not be committed to GitHub (they are excluded in the `.gitignore` file).
+Before vagrant provisioning, copy the `modules/rpm_build/files/gnupg`
+directory from our Puppet 3 repo to `sensitive/gnupg` of this Vagrant
+project. These files are used when signing the rpm files. These files
+should not be committed to GitHub (they are excluded in the `.gitignore`
+file).
 
 
 ## 

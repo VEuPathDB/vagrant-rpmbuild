@@ -1,4 +1,3 @@
-# bootstrap VM with pre-Puppet tasks
 ---
 - hosts: all
   become: no
@@ -11,7 +10,8 @@
   tasks:
 
     - name: install python-ssl for python 2.4 SSL validation for EL5
-      yum:  name=python-ssl
+      yum:
+        name: python-ssl
       when: ansible_distribution_major_version == '5'
       become: yes
 
@@ -21,24 +21,28 @@
       become: yes
 
     - name: Add Pulp YUM repo
-      get_url: url=https://repos.fedorapeople.org/repos/pulp/pulp/rhel-pulp.repo
-               dest=/etc/yum.repos.d/pulp-v2-stable.repo
+      get_url:
+        url: https://repos.fedorapeople.org/repos/pulp/pulp/rhel-pulp.repo
+        dest: /etc/yum.repos.d/pulp-v2-stable.repo
       when: ansible_distribution_major_version > '6'
       become: yes
 
       # EL6 support (incl. pulp-admin pkg) maxes out at Pulp 2.11
     - name: Add Pulp YUM repo for EL6
-      get_url: url=https://repos.fedorapeople.org/repos/pulp/pulp/rhel6-pulp.repo
-               dest=/etc/yum.repos.d/rhel6-pulp.repo
+      get_url:
+        url: https://repos.fedorapeople.org/repos/pulp/pulp/rhel6-pulp.repo
+        dest: /etc/yum.repos.d/rhel6-pulp.repo
       when: ansible_distribution_major_version == '6'
       become: yes
 
     - name: Add EPEL YUM repo
-      yum: name=epel-release
+      yum:
+        name: epel-release
       become: yes
 
     - name: install devel packages
-      yum: name="{{ item }}"
+      yum: 
+        name: "{{ item }}"
       with_items:
         - bzip2-devel
         - cpanspec
@@ -65,7 +69,8 @@
       become: yes
 
     - name: install Pulp client packages
-      yum: name="{{ item }}"
+      yum:
+        name: "{{ item }}"
       with_items:
         - perl-ExtUtils-MakeMaker
         - perl-Test-Simple
@@ -81,14 +86,16 @@
     - include: tasks/R2spec.yml
 
     - name: install python27 devel packages for EL6
-      yum: name="{{ item }}"
+      yum:
+        name: "{{ item }}"
       with_items:
         - python27-devel
       become: yes
       when: ansible_distribution_major_version == '6'
 
     - name: install python devel packages for EL7
-      yum: name="{{ item }}"
+      yum:
+        name: "{{ item }}"
       with_items:
         - python-devel
         - rpm-sign
@@ -100,9 +107,19 @@
     - include: tasks/apidb-ca-el5.yml
       when: ansible_distribution_major_version == '5'
 
-    - name: check for existing dot files for vagrant user
-      stat: path='{{ item.dest }}'
-      register: dotfiles
+    - name: install persistent bash_history file
+      template:
+        dest: /home/vagrant/.bash_history_persistent
+        src: templates/vagrant_bash_history.j2
+        owner: vagrant
+        mode: '0644'
+
+    - name: install dot files for vagrant user
+      copy:
+        src: '{{ item.src }}'
+        dest: '/home/vagrant/{{ item.dest }}'
+        owner: vagrant
+        mode: '0644'
       with_items:
         - { src: 'files/vagrant_bash_profile',
             dest: '.bash_profile'
@@ -110,45 +127,39 @@
         - { src: 'files/vagrant_bash_logout',
             dest: '.bash_logout'
           }
-        - { src: 'files/vagrant_bash_history',
-            dest: '.bash_history'
-          }
-
-    - name: install dot files for vagrant user
-      copy: src='{{ item.item.src }}'
-            dest='/home/vagrant/{{ item.item.dest }}'
-            owner=vagrant
-            mode=0644
-      when: item.stat.exists == false
-      with_items: '{{ dotfiles.results }}'
 
     - name: add git host to known_hosts
-      known_hosts: path="/home/vagrant/.ssh/known_hosts"
-                   host='git.apidb.org'
-                   key="{{ lookup('pipe','ssh-keyscan -p 2112 git.apidb.org') }}"
+      known_hosts:
+        path: "/home/vagrant/.ssh/known_hosts"
+        host: 'git.apidb.org'
+        key: "{{ lookup('pipe','ssh-keyscan -p 2112 git.apidb.org') }}"
 
     - name: mkdir /home/vagrant/bin
-      file: path=/home/vagrant/bin
-            state=directory
-            owner=vagrant
+      file:
+        path: /home/vagrant/bin
+        state: directory
+        owner: vagrant
     - name: install upload-workflow-pkg script
-      template: dest=/home/vagrant/bin/upload-workflow-pkg
-                src=templates/upload-workflow-pkg.j2
-                owner=vagrant
-                mode=755
+      template:
+        dest: /home/vagrant/bin/upload-workflow-pkg
+        src: templates/upload-workflow-pkg.j2
+        owner: vagrant
+        mode: '0755'
 
     - name: install gnupg keys
-      copy: src=sensitive/gnupg/
-            dest=/home/vagrant/.gnupg
-            mode=0600
-            force=yes
-            directory_mode=0700
+      copy:
+        src: sensitive/gnupg/
+        dest: /home/vagrant/.gnupg
+        mode: '0600'
+        force: yes
+        directory_mode: '0700'
 
     - name: configure Pulp admin
-      ini_file: dest=/etc/pulp/admin/admin.conf
-                section=server
-                option="{{ item.option }}"
-                value="{{ item.value }}"
+      ini_file:
+        dest: /etc/pulp/admin/admin.conf
+        section: server
+        option: "{{ item.option }}"
+        value: "{{ item.value }}"
       when: ansible_distribution_major_version > '5'
       become: yes
       with_items:
@@ -163,10 +174,11 @@
           }
 
     - name: install Pulp pseudo-admin scripts for EL5
-      copy: src='files/{{ item }}'
-            dest='/home/vagrant/bin/{{ item }}'
-            owner=vagrant
-            mode=0755
+      copy:
+        src: 'files/{{ item }}'
+        dest: '/home/vagrant/bin/{{ item }}'
+        owner: vagrant
+        mode: '0755'
       when: ansible_distribution_major_version == '5'
       with_items:
         - pulp-publish

@@ -7,8 +7,10 @@ pulp-admin login -u mheiges
 pulp-admin orphan list --type=rpm --details
 pulp-admin orphan remove --type=rpm
 pulp-admin repo list --details
-pulp-admin rpm repo uploads rpm --repo-id eupathdb-7-x86_64 --file fpc-2.4.0-1.x86_64.rpm --skip-existing
-pulp-admin rpm repo uploads rpm --repo-id eupathdb-7-SRPMS --dir /home/vagrant/rpmbuild/SRPMS/ --skip-existing
+pulp-admin rpm repo uploads rpm --repo-id eupathdb-{{ ansible_distribution_major_version }}-x86_64 --file fpc-2.4.0-1.x86_64.rpm --skip-existing
+pulp-admin rpm repo uploads rpm --repo-id eupathdb-{{ ansible_distribution_major_version }}-SRPMS --dir /home/vagrant/rpmbuild/SRPMS/ --skip-existing
+pulp-admin rpm repo uploads rpm --repo-id eupathdb-{{ ansible_distribution_major_version }}-workflow-x86_64 --file 	blat-35-35-1uga.x86_64.rpm --skip-existing
+pulp-admin rpm repo uploads rpm --repo-id eupathdb-{{ ansible_distribution_major_version }}-workflow-SRPMS --dir /home/vagrant/rpmbuild/SRPMS/ --skip-existing
 pulp-admin tasks list
 R2spec -p bitops --no-suggest  --no-check --name 'Mark Heiges' --email 'mheiges@uga.edu'
 rpm --addsign  /home/vagrant/rpmbuild/RPMS/x86_64/mod_auth_tkt-*

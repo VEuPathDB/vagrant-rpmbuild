@@ -17,3 +17,10 @@ if [[ -f ~/.lastdir ]]; then
 fi
 
 export PS1='\n[$(date +"%H:%M %Y%m%d") \u@\h \w]\n\$ '
+
+export HISTCONTROL=ignoredups
+
+# ensure base history is not clobbered by .bash_history overwrites
+if [[ -f "$HOME/.bash_history_persistent" ]]; then
+  history -r .bash_history_persistent
+fi
