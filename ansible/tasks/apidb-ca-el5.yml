@@ -1,12 +1,14 @@
-- stat: path=/etc/pki/tls/certs/ca-bundle.crt.dist
+- stat:
+    path: /etc/pki/tls/certs/ca-bundle.crt.dist
   register: bundle_dist
 
 - command: mv /etc/pki/tls/certs/ca-bundle.crt /etc/pki/tls/certs/ca-bundle.crt.dist
   when: not bundle_dist.stat.exists
   become: yes
 
-- copy: src=files/apidb-ca-rsa.crt
-        dest='{{ item }}'
+- copy:
+    src: files/apidb-ca-rsa.crt
+    dest: '{{ item }}'
   register: ca_crt
   become: yes
   with_items:

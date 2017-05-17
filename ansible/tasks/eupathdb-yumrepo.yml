@@ -3,14 +3,16 @@
 # data (avoiding "Error performing checksum")
 
 - name: install python-hashlib for sha256 YUM checksums
-  yum: name="{{ item }}"
+  yum:
+    name: "{{ item }}"
   with_items:
     - python-hashlib
   when: ansible_distribution_major_version == '5'
 
 - name: install RPM-GPG-KEY-EUPATHDB
-  copy: src=files/RPM-GPG-KEY-EUPATHDB
-        dest=/etc/pki/rpm-gpg/RPM-GPG-KEY-EUPATHDB
+  copy:
+    src: files/RPM-GPG-KEY-EUPATHDB
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-EUPATHDB
   register: gpgkeyeupathdb
 
 - name: import RPM-GPG-KEY-EUPATHDB
@@ -18,9 +20,10 @@
   when: gpgkeyeupathdb.changed
 
 - name: configure eupath YUM repos
-  template: src='{{ item.src }}'
-            dest='{{ item.dest }}'
-            force=yes
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    force: yes
   with_items: 
     - { src: templates/eupathdb.repo.j2,
         dest: /etc/yum.repos.d/eupathdb.repo }

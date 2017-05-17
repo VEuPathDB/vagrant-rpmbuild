@@ -3,7 +3,8 @@
 # ca-certificates is not packaged for EL5.
 
 - name: install ca-certificates package
-  yum: name=ca-certificates
+  yum:
+    name: ca-certificates
   become: yes
 
 - name: update-ca-trust check
@@ -19,8 +20,9 @@
   when: ansible_distribution_major_version == '6' and ca_trust_enabled.stdout.find('DISABLED') != -1
   
 - name: install apidb-ca-rsa.crt
-  copy: src=files/apidb-ca-rsa.crt
-        dest='{{ item }}'
+  copy:
+    src: files/apidb-ca-rsa.crt
+    dest: '{{ item }}'
   register: ca_crt
   become: yes
   with_items:

@@ -1,8 +1,9 @@
 # dirs that can not be on a vboxfs file system because hardlinks are not allowed
 # https://www.virtualbox.org/ticket/818
 - name: make rpmbuild directories on guest VM
-  file: path="{{ rpmbuild_topdir }}/{{ item }}"
-        state=directory
+  file:
+    path: "{{ rpmbuild_topdir }}/{{ item }}"
+    state: directory
   with_items:
     - BUILD
     - BUILDROOT
@@ -10,8 +11,9 @@
 # These dirs are on a vboxfs file system shared with host
 # to aid debugging, file editing
 - name: make rpmbuild directories shared from host
-  file: path="{{ shared_rpmbuild_topdir }}/{{ item }}"
-        state=directory
+  file:
+    path: "{{ shared_rpmbuild_topdir }}/{{ item }}"
+    state: directory
   with_items:
     - RPMS
     - SOURCES
@@ -21,9 +23,10 @@
 # symlink from shared dir to rpmbuild_topdir to create a
 # complete rpmbuild directory structure.
 - name: symlink rpmbuild directories shared from host
-  file: path='{{ item.path }}'
-        src='{{ item.src }}'
-        state=link
+  file:
+    path: '{{ item.path }}'
+    src: '{{ item.src }}'
+    state: link
   with_items:
     - { src: '{{ shared_rpmbuild_topdir }}/RPMS',
         path: '{{ rpmbuild_topdir }}/RPMS'
@@ -41,9 +44,10 @@
 # symlinks on shared volume to real dirs on guest. These
 # will be invalid links when viewed from the host filesystem.
 - name: symlink rpmbuild directories shared from guest
-  file: path='{{ item.path }}'
-        src='{{ item.src }}'
-        state=link
+  file:
+    path: '{{ item.path }}'
+    src: '{{ item.src }}'
+    state: link
   with_items:
     - { src: '{{ rpmbuild_topdir }}/BUILD',
         path: '{{ shared_rpmbuild_topdir }}/BUILD'
@@ -59,14 +63,16 @@
   delegate_to: 127.0.0.1
   changed_when: false
 - name: configure .rpmmacros
-  template: dest=/home/vagrant/.rpmmacros
-            src=templates/rpmmacros.j2
+  template:
+    dest: /home/vagrant/.rpmmacros
+    src: templates/rpmmacros.j2
 
 - name: configure macros.eupathdbworkflow
-  copy: src=files/macros.eupathdbworkflow
-        dest=/etc/rpm/macros.eupathdbworkflow
-        owner=root
-        group=root
-        mode=0644
+  copy:
+    src: files/macros.eupathdbworkflow
+    dest: /etc/rpm/macros.eupathdbworkflow
+    owner: root
+    group: root
+    mode: '0644'
   become: yes
 

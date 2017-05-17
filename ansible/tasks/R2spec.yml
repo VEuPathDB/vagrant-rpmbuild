@@ -1,16 +1,18 @@
 
 - name: install R2Spec
-  yum: name="{{ item }}"
+  yum:
+    name: "{{ item }}"
   with_items:
-        - R2spec
+    - R2spec
   become: yes
 
 
 - name: install custom R2spec template
-  copy: src='{{ item.src }}'
-        dest='{{ item.dest }}'
-        owner=root
-        mode=0644
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    owner: root
+    mode: '0644'
   with_items:
     - { src: 'files/R2spec/specfile.tpl',
         dest: '/usr/lib/{{ {"5": "python2.4", "6": "python2.6", "7": "python2.7"}[ansible_distribution_major_version] }}/site-packages/r2spec/specfile.tpl'
