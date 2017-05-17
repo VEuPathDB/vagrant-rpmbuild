@@ -11,6 +11,10 @@ pulp-admin rpm repo uploads rpm --repo-id eupathdb-{{ ansible_distribution_major
 pulp-admin rpm repo uploads rpm --repo-id eupathdb-{{ ansible_distribution_major_version }}-SRPMS --dir /home/vagrant/rpmbuild/SRPMS/ --skip-existing
 pulp-admin rpm repo uploads rpm --repo-id eupathdb-{{ ansible_distribution_major_version }}-workflow-x86_64 --file 	blat-35-35-1uga.x86_64.rpm --skip-existing
 pulp-admin rpm repo uploads rpm --repo-id eupathdb-{{ ansible_distribution_major_version }}-workflow-SRPMS --dir /home/vagrant/rpmbuild/SRPMS/ --skip-existing
+pulp-admin rpm repo publish run --repo-id eupathdb-{{ ansible_distribution_major_version }}-x86_64
+pulp-admin rpm repo publish run --repo-id eupathdb-{{ ansible_distribution_major_version }}-SRPMS
+pulp-admin rpm repo publish run --repo-id eupathdb-{{ ansible_distribution_major_version }}-workflow-x86_64
+pulp-admin rpm repo publish run --repo-id eupathdb-{{ ansible_distribution_major_version }}-workflow-SRPMS
 pulp-admin tasks list
 R2spec -p bitops --no-suggest  --no-check --name 'Mark Heiges' --email 'mheiges@uga.edu'
 rpm --addsign  /home/vagrant/rpmbuild/RPMS/x86_64/mod_auth_tkt-*
