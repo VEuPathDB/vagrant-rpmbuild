@@ -10,6 +10,14 @@ project. These files are used when signing the rpm files. These files
 should not be committed to GitHub (they are excluded in the `.gitignore`
 file).
 
+These can be yanked directly from git,
+
+    cd vagrant-rpmbuild
+
+    git archive --remote git@git.apidb.org:puppet HEAD | \
+      tar --strip-components=3 \
+        -C ansible/sensitive/ \
+        -x modules/rpm_build/files/gnupg
 
 ## 
 
