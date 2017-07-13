@@ -80,6 +80,11 @@ For EuPathDB specific policies and guidelines see
 
 [Pulp Yum Repo](https://wiki.apidb.org/index.php/PulpYumRepo)
 
+The `vagrant` account is provisioned with a bash history that contains
+some commonly used command examples. This is especially helpful with
+seeing example Pulp uses that you can edit for your specific needs. This
+might save you a trip to the wiki.
+
 ## Shared volumes
 
 For those of us who are not hard-core terminal gurus it can be handy to
