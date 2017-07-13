@@ -23,7 +23,7 @@ These can be yanked directly from git,
         -C ansible/sensitive/ \
         -x modules/rpm_build/files/gnupg
 
-## 
+##
 
 This vagrant project supports CentOS 6 and CentOS 7 VMs. Running
 
@@ -45,6 +45,30 @@ The `el6` or `el7` names must be specified when running `vagrant ssh`
 or
 
     vagrant ssh el7
+
+Vagrant will provision the guest with a starter RPM build environment.
+You will need to install additional software dependencies as needed to
+satisfy particular RPM builds.
+
+## The RPM Build Environment
+
+A build directory skeleton is provided on the guest VM at
+`~vagrant/rpmbuild`. Note some subdirectories are symlinks to the shared
+volume on the host OS so you will be able to access files there if
+desired.
+
+    $ ls -gG  ~vagrant/rpmbuild/
+    total 0
+    drwxrwxr-x 2  6 Jul 13 11:04 BUILD
+    drwxrwxr-x 2  6 Jul 13 11:04 BUILDROOT
+    lrwxrwxrwx 1 32 Jul 13 11:04 RPMS -> /vagrant/scratch/7/rpmbuild/RPMS
+    lrwxrwxrwx 1 35 Jul 13 11:04 SOURCES -> /vagrant/scratch/7/rpmbuild/SOURCES
+    lrwxrwxrwx 1 33 Jul 13 11:04 SPECS -> /vagrant/scratch/7/rpmbuild/SPECS
+    lrwxrwxrwx 1 33 Jul 13 11:04 SRPMS -> /vagrant/scratch/7/rpmbuild/SRPMS
+
+
+There is a lot of information online documenting writing spec files and
+building RPMs that you should consult.
 
 ## Shared volumes
 
