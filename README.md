@@ -25,8 +25,6 @@ These can be yanked directly from git,
 
 See `gnupg RPM signing key` in Passpack for passphrase.
 
-##
-
 This vagrant project supports CentOS 6 and CentOS 7 VMs. Running
 
     vagrant up
@@ -69,10 +67,18 @@ desired.
     lrwxrwxrwx 1 33 Jul 13 11:04 SPECS -> /vagrant/scratch/7/rpmbuild/SPECS
     lrwxrwxrwx 1 33 Jul 13 11:04 SRPMS -> /vagrant/scratch/7/rpmbuild/SRPMS
 
-See `gnupg RPM signing key` in Passpack for gpg signing key passphrase.
+RPM signing infrastructure is installed as part of the aforementioned
+provisioning. See `gnupg RPM signing key` in Passpack for gpg signing
+key passphrase.
 
 There is a lot of information online documenting writing spec files and
 building RPMs that you should consult.
+
+For EuPathDB specific policies and guidelines see
+
+[Building RPMS](https://wiki.apidb.org/index.php/Building%20RPMs)
+
+[Pulp Yum Repo](https://wiki.apidb.org/index.php/PulpYumRepo)
 
 ## Shared volumes
 
