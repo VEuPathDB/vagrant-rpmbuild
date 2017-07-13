@@ -23,6 +23,8 @@ These can be yanked directly from git,
         -C ansible/sensitive/ \
         -x modules/rpm_build/files/gnupg
 
+See `gnupg RPM signing key` in Passpack for passphrase.
+
 ##
 
 This vagrant project supports CentOS 6 and CentOS 7 VMs. Running
@@ -48,7 +50,8 @@ or
 
 Vagrant will provision the guest with a starter RPM build environment.
 You will need to install additional software dependencies as needed to
-satisfy particular RPM builds.
+satisfy particular RPM builds. The `vagrant` user has full `sudo` access
+to permit any system changes you need.
 
 ## The RPM Build Environment
 
@@ -66,6 +69,7 @@ desired.
     lrwxrwxrwx 1 33 Jul 13 11:04 SPECS -> /vagrant/scratch/7/rpmbuild/SPECS
     lrwxrwxrwx 1 33 Jul 13 11:04 SRPMS -> /vagrant/scratch/7/rpmbuild/SRPMS
 
+See `gnupg RPM signing key` in Passpack for gpg signing key passphrase.
 
 There is a lot of information online documenting writing spec files and
 building RPMs that you should consult.
