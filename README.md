@@ -4,6 +4,10 @@ repository.
 
 ## Setup
 
+Clone this repository
+
+    git clone https://github.com/EuPathDB/vagrant-rpmbuild.git
+
 Before vagrant provisioning, copy the `modules/rpm_build/files/gnupg`
 directory from our Puppet 3 repo to `ansible/sensitive/gnupg` of this
 Vagrant project (these are not in our Puppet 4 repo). These files are
