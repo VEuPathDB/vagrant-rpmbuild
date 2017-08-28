@@ -1,10 +1,12 @@
 WF_SERVERS = {
   :el7 => {
     :vagrant_box     => 'ebrc/centos-7-64-puppet',
+    :vagrant_box_url => 'http://software.apidb.org/vagrant/centos-7-64-puppet.json',
     :wf_hostname     => 'package-7-64.vm',
   },
   :el6 => {
     :vagrant_box     => 'puppetlabs/centos-6.6-64-nocm',
+    :vagrant_box_url => 'http://software.apidb.org/vagrant/centos-7-64-puppet.json',
     :wf_hostname     => 'package-6-64.vm',
   }
 }
