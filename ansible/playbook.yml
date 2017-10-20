@@ -48,6 +48,10 @@
         name: epel-release
       become: yes
 
+    - name: yum clean all
+      shell: yum clean all
+      become: yes
+
     - name: install devel packages
       yum: 
         name: "{{ item }}"
@@ -66,6 +70,7 @@
         - ncurses-devel
         - openssl-devel
         - python-virtualenv
+        - R-Rcpp-devel
         - readline-devel
         - rpm-build
         - rpmdevtools
