@@ -12,9 +12,9 @@
 - name: get git.apidb.org host key
   shell: ssh-keyscan -p2112 git.apidb.org
   register: git_host_key
+  changed_when: false
 
-
-- name: add git host to known_hosts.
+- name: add git host to known_hosts
   known_hosts:
     path: "{{ git_knownhosts_path }}"
     name: '[git.apidb.org]:2112' # match output of ssh-keyscan
