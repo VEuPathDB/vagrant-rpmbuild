@@ -38,9 +38,12 @@
       when: ansible_distribution_major_version > '5'
       become: yes
 
+      # backslash silences Ansible's `use yum module` warnings, which
+      # are useless given that the yum module does not support `clean`.
     - name: yum clean all
-      shell: yum clean all
+      shell: \yum clean all
       become: yes
+      changed_when: false
 
     - name: install devel packages
       yum: 
