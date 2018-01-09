@@ -134,7 +134,7 @@
             dest: '.bash_logout'
           }
 
-    - import_tasks: tasks/knownhosts-git.yml
+    - import_tasks: tasks/ebrc-git-knownhosts.yml
       vars:
         git_knownhosts_path: '/home/vagrant/.ssh/known_hosts'
 
