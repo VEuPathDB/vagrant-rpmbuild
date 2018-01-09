@@ -16,8 +16,9 @@
   register: gpgkeyeupathdb
 
 - name: import RPM-GPG-KEY-EUPATHDB
-  command: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EUPATHDB
-  when: gpgkeyeupathdb.changed
+  rpm_key:
+    state: present
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EUPATHDB
 
 - name: configure eupath YUM repos
   template:
