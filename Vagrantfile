@@ -54,6 +54,7 @@ Vagrant.configure(2) do |config|
       end
 
       vm_config.vm.provision :ansible do |ansible|
+        ansible.compatibility_mode = '2.0'
         ansible.playbook = 'ansible/playbook.yml'
       end
 
