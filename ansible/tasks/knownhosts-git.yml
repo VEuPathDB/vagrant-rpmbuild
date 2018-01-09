@@ -1,0 +1,22 @@
+# This task adds the ssh host keys from git.apidb.org to .ssh/known_hosts
+# This should be a role defined in requirements.yml and installed by
+# Ansible Galaxy so it can be shared among other projects that need it.
+
+  # lookup() happens on Ansible control host. ssh-keyscan on OS X
+  # 10.10 does not support ecdsa keys used git.apidb.org, so getting
+  # host keys from VM's Linux shell. Be aware that ssh-keyscan
+  # output varies with version (may or may not need -H to include
+  # port in output, may or may not include brackets around hostname)
+  # and that affects the `name` arg value required for the Ansible
+  # known_hosts module. *sigh*
+- name: get git.apidb.org host key
+  shell: ssh-keyscan -p2112 git.apidb.org
+  register: git_host_key
+
+
+- name: add git host to known_hosts.
+  known_hosts:
+    path: "{{ git_knownhosts_path }}"
+    name: '[git.apidb.org]:2112' # match output of ssh-keyscan
+    key: "{{ git_host_key.stdout }}"
+  become: no

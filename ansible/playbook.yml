@@ -134,11 +134,9 @@
             dest: '.bash_logout'
           }
 
-    - name: add git host to known_hosts
-      known_hosts:
-        path: "/home/vagrant/.ssh/known_hosts"
-        host: 'git.apidb.org'
-        key: "{{ lookup('pipe','ssh-keyscan -p 2112 git.apidb.org') }}"
+    - import_tasks: tasks/knownhosts-git.yml
+      vars:
+        git_knownhosts_path: '/home/vagrant/.ssh/known_hosts'
 
     - name: mkdir /home/vagrant/bin
       file:
