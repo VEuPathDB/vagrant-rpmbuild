@@ -23,29 +23,19 @@
       when: ansible_distribution_major_version == '5'
       become: yes
 
-    - name: Add EuPathDB YUM repos (skip if EL5)
+    - name: Add EuPathDB YUM repo (skip if EL5)
       import_tasks: tasks/eupathdb-yumrepo.yml
       when: ansible_distribution_major_version > '5'
       become: yes
 
-    - name: Add Pulp YUM repo
-      get_url:
-        url: https://repos.fedorapeople.org/repos/pulp/pulp/rhel-pulp.repo
-        dest: /etc/yum.repos.d/pulp-v2-stable.repo
-      when: ansible_distribution_major_version > '6'
+    - name: Add Pulp YUM repo (skip if EL5)
+      import_tasks: tasks/pulp-yumrepo.yml
+      when: ansible_distribution_major_version > '5'
       become: yes
 
-      # EL6 support (incl. pulp-admin pkg) maxes out at Pulp 2.11
-    - name: Add Pulp YUM repo for EL6
-      get_url:
-        url: https://repos.fedorapeople.org/repos/pulp/pulp/rhel6-pulp.repo
-        dest: /etc/yum.repos.d/rhel6-pulp.repo
-      when: ansible_distribution_major_version == '6'
-      become: yes
-
-    - name: Add EPEL YUM repo
-      yum:
-        name: epel-release
+    - name: Add EPEL YUM repo (skip if EL5)
+      import_tasks: tasks/epel-yumrepo.yml
+      when: ansible_distribution_major_version > '5'
       become: yes
 
     - name: yum clean all

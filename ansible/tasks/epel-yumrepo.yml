@@ -1,0 +1,5 @@
+# Configure YUM repo for EPEL
+- name: Add EPEL YUM repo
+  yum:
+    name: epel-release
+  become: yes
