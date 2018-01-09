@@ -24,7 +24,7 @@
       become: yes
 
     - name: Add EuPathDB YUM repos (skip if EL5)
-      include: tasks/eupathdb-yumrepo.yml
+      import_tasks: tasks/eupathdb-yumrepo.yml
       when: ansible_distribution_major_version > '5'
       become: yes
 
@@ -95,8 +95,8 @@
       when: ansible_distribution_major_version > '5'
       become: yes
 
-    - include: tasks/rpmbuild.yml
-    - include: tasks/R2spec.yml
+    - import_tasks: tasks/rpmbuild.yml
+    - import_tasks: tasks/R2spec.yml
 
     - name: install python27 devel packages for EL6
       yum:
@@ -115,9 +115,9 @@
       become: yes
       when: ansible_distribution_major_version == '7'
 
-    - include: tasks/apidb-ca.yml
+    - import_tasks: tasks/apidb-ca.yml
       when: ansible_distribution_major_version > '5'
-    - include: tasks/apidb-ca-el5.yml
+    - import_tasks: tasks/apidb-ca-el5.yml
       when: ansible_distribution_major_version == '5'
 
     - name: install persistent bash_history file
