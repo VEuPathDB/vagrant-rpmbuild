@@ -85,6 +85,13 @@
         - zlib-devel
       become: yes
 
+    - name: install Singularity packages
+      yum: 
+        name: "{{ item }}"
+      with_items:
+        - singularity
+      become: yes
+
     - name: install Pulp client packages
       yum:
         name: "{{ item }}"
