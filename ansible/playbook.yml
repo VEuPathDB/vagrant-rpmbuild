@@ -49,16 +49,20 @@
       yum: 
         name: "{{ item }}"
       with_items:
+        - autoconf
+        - automake
         - bzip2-devel
+        - chrpath
         - cpanspec
         - db4-devel
         - facter
         - gcc-c++
         - gdbm-devel
         - git
-        - libpcap-devel
         - libcurl-devel
+        - libpcap-devel
         - libpng-devel
+        - libtool
         - libxml2-devel
         - ncurses-devel
         - openssl-devel
