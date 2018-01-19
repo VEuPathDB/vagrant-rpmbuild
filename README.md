@@ -2,6 +2,8 @@ An environment for building RPMs. Vagrant setups a base system for
 running `rpmbuild` and uploading with the packages to our Pulp
 repository.
 
+Also includes support for building Singularity images.
+
 ## Setup
 
 Clone this repository
