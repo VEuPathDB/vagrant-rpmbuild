@@ -1,6 +1,7 @@
 An environment for building RPMs. Vagrant setups a base system for
 running `rpmbuild` and uploading with the packages to our Pulp
-repository.
+repository. This includes
+[RPMs for workflows](https://wiki.apidb.org/index.php/WorkflowRPMs).
 
 Also includes support for building [Singularity](http://singularity.lbl.gov) images.
 
@@ -82,6 +83,8 @@ For EuPathDB specific policies and guidelines see
 
 [Pulp Yum Repo](https://wiki.apidb.org/index.php/PulpYumRepo)
 
+[WorkflowRPMs](https://wiki.apidb.org/index.php/WorkflowRPMs)
+
 The `vagrant` account is provisioned with a bash history that contains
 some commonly used command examples. This is especially helpful with
 seeing example Pulp uses that you can edit for your specific needs. This
@@ -106,16 +109,16 @@ shared folders (`vboxfs`).
 The `vboxfs` VirtualBox sharing is slower than NFS and can be a
 problem with very large source code compiles. For most software
 packaging though it is not noticeably worse than a native filesystem so
-its workable.
+it's workable.
 
 A bigger problem with `vboxfs` is that hard links are not allowed on the
 shared volume (https://www.virtualbox.org/ticket/818) and some software
 requires them. Therefore the `rpmbuild` directory on these VMs is
 constructed so the `BUILD` and `BUILDROOT` are on a virtual machine's
 native filesystem and the other subdirectories are on the shared volume
-for easy access by host editors and so files (especially spec files)
-survive a `vagrant destroy`. Soft symbolic links are used to complete
-the `rpmbuild` directory structure.
+for easy access by host editors and so files (especially RPM `.spec`
+files) survive a `vagrant destroy`. Soft symbolic links are used to
+complete the `rpmbuild` directory structure.
 
 In some cases, running `make install` on a vboxsf shared volume that is
 provided by a case-preserving, case-insensitive OS X host volume can
