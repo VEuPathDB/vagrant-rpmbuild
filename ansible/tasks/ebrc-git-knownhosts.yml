@@ -14,9 +14,18 @@
   register: git_host_key
   changed_when: false
 
-- name: add git host to known_hosts
+- name: add git host to known_hosts for EL7
   known_hosts:
     path: "{{ git_knownhosts_path }}"
     name: '[git.apidb.org]:2112' # match output of ssh-keyscan
     key: "{{ git_host_key.stdout }}"
   become: no
+  when: ansible_distribution_major_version >= '7'
+
+- name: add git host to known_hosts for EL6
+  known_hosts:
+    path: "{{ git_knownhosts_path }}"
+    host: 'git.apidb.org'
+    key: "{{ lookup('pipe','ssh-keyscan -p 2112 git.apidb.org') }}"
+  become: no
+  when: ansible_distribution_major_version == '6'
