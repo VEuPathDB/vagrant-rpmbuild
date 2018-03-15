@@ -1,0 +1,22 @@
+# Add WANdisco YUM repo for Subversion
+# https://wandisco.com
+
+- name: install RPM-GPG-KEY-WANdisco
+  get_url:
+    url: http://opensource.wandisco.com/RPM-GPG-KEY-WANdisco
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-WANdisco
+  register: gpgkeywandisco
+
+- name: import RPM-GPG-KEY-WANdisco
+  rpm_key:
+    state: present
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-WANdisco
+
+- name: configure eupath YUM repos
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    force: yes
+  with_items: 
+    - { src: templates/wandisco.repo.j2,
+        dest: /etc/yum.repos.d/wandisco.repo }

@@ -38,6 +38,11 @@
       when: ansible_distribution_major_version > '5'
       become: yes
 
+    - name: Add WANdisco YUM repo (skip if EL5)
+      import_tasks: tasks/wandisco-yumrepo.yml
+      when: ansible_distribution_major_version > '5'
+      become: yes
+
     - name: disable yum fastestmirror
       lineinfile:
         path: /etc/yum/pluginconf.d/fastestmirror.conf
